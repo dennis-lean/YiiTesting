@@ -1,0 +1,30 @@
+body {
+	background: #061120;
+	font-size: 11pt;
+}
+#page {
+	width: 500px;
+	height: 400px;
+	margin: 30px auto;
+	padding: 20px 20px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	background: #FFDDAA;
+    background: -moz-linear-gradient( center bottom , #FFDDAA 0%, #FFEECC 10%, #FFEECC 90%, #FFDDAA 100% ) repeat scroll 0 0 #FFDDAA;
+    background: -webkit-gradient( linear, left bottom, left top, color-stop(0, #FFDDAA), color-stop(0.2, #FFEECC), color-stop(0.85, #FFF6E0), color-stop(0.85, #FFDDAA), color-stop(1, #FFDDAA) );
+	overflow: hidden;
+}
+
+#page .header {
+	font-size: 22pt;
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+input.big-textbox {
+	width: 95%;
+	padding: 5px;
+	border: 1px solid #AAA;
+	font-size: 10pt;
+}
