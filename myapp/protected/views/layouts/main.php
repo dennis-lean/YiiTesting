@@ -11,6 +11,7 @@
 <body>
 
 <div class="container" id="page">
+	<div class="header">Dennis Site</div>
 	<?php echo $content; ?>
 </div>
 
