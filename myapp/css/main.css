@@ -24,8 +24,8 @@ div.second-stage {
 	-moz-border-radius: 10px;
 	border-radius: 10px;
 	background: #FFDDAA;
-    background: -moz-linear-gradient( center bottom , #FFDDAA 0%, #FFEECC 10%, #FFEECC 90%, #FFDDAA 100% ) repeat scroll 0 0 #FFDDAA;
-    background: -webkit-gradient( linear, left bottom, left top, color-stop(0, #FFDDAA), color-stop(0.2, #FFEECC), color-stop(0.85, #FFF6E0), color-stop(0.85, #FFDDAA), color-stop(1, #FFDDAA) );
+    background: -moz-linear-gradient( center bottom , #FFDDAA 0%, #FFEECC 40%, #FFF6E0 85%, #FFDDAA 85%, #FFDDAA 100% ) repeat scroll 0 0 #FFDDAA;
+    background: -webkit-gradient( linear, left bottom, left top, color-stop(0, #FFDDAA), color-stop(0.4, #FFEECC), color-stop(0.85, #FFF6E0), color-stop(0.85, #FFDDAA), color-stop(1, #FFDDAA) );
 	-moz-box-shadow: 0px 0px 25px #FFF;
 	-webkit-box-shadow: 0px 0px 25px #FFF;
 	box-shadow: 0px 0px 25px #FFF;
