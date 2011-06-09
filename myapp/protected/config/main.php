@@ -35,6 +35,7 @@ return array(
 		),
 		'db'=>array(
 			'connectionString' => 'sqlite:'.dirname(__FILE__).'/../data/testdrive.db',
+			'tablePrefix' => 'dennis_',
 		),
 		'errorHandler'=>array(
 			// use 'site/error' action to display errors

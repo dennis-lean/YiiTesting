@@ -2,24 +2,74 @@ body {
 	background: #061120;
 	font-size: 11pt;
 }
-body.theater {
+body.theater-mode {
 	overflow: hidden;
 }
-div.second-stage {
+body.theater-mode div.theater-mask,
+body.theater-mode div.theater-container {
+	display: block;
+}
+div.theater-mask {
 	position: fixed;
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: #000;
-	z-index: 100;
-	opacity: 0.5;
+	background: #061120;
+	z-index: 50;
+	opacity: 0.7;
+	display: none;
+}
+div.theater-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 51;
+	overflow: auto;
+	display: none;
+}
+#signup_form,
+#resetpwd_form {
+	background: #FFF;
+	padding: 10px 20px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	-moz-box-shadow: 0px 0px 25px #FFF;
+	-webkit-box-shadow: 0px 0px 25px #FFF;
+	box-shadow: 0px 0px 25px #FFF;
+}
+#resetpwd_form {
+	margin: 100px auto auto auto;
+	width: 300px;
+	height: 200px;
+	background: #FFDDAA;
+    background: -moz-linear-gradient( center bottom , #FFDDAA 0%, #FFEECC 40%, #FFF6E0 85%, #FFDDAA 85%, #FFDDAA 100% ) repeat scroll 0 0 #FFDDAA;
+    background: -webkit-gradient( linear, left bottom, left top, color-stop(0, #FFDDAA), color-stop(0.4, #FFEECC), color-stop(0.85, #FFF6E0), color-stop(0.85, #FFDDAA), color-stop(1, #FFDDAA) );
+}
+#signup_form {
+	margin: 50px auto auto auto;
+	width: 400px;
+	height: 300px;
+	background: #FFDDAA;
+    background: -moz-linear-gradient( center bottom , #FFDDAA 0%, #FFEECC 40%, #FFF6E0 89%, #FFDDAA 89%, #FFDDAA 100% ) repeat scroll 0 0 #FFDDAA;
+    background: -webkit-gradient( linear, left bottom, left top, color-stop(0, #FFDDAA), color-stop(0.4, #FFEECC), color-stop(0.89, #FFF6E0), color-stop(0.89, #FFDDAA), color-stop(1, #FFDDAA) );
+}
+
+.close_button {
+	float: right;
+	cursor: pointer;
+}
+.close_button:hover {
+	color: #666;
 }
 #page {
 	width: 500px;
 	height: 340px;
 	margin: 30px auto;
-	padding: 20px 20px;
+	padding: 10px 20px;
 	-webkit-border-radius: 10px;
 	-moz-border-radius: 10px;
 	border-radius: 10px;
@@ -35,6 +85,7 @@ div.second-stage {
 #page .header {
 	font-size: 22pt;
 	text-align: center;
+	margin-top: 10px;
 	margin-bottom: 20px;
 }
 
@@ -43,10 +94,15 @@ input.big-textbox {
 	padding: 5px;
 	border: 1px solid #AAA;
 	font-size: 10pt;
+	margin-bottom: 10px
 }
 
 #errMsg {
 	color: #F00;
 	text-align: center;
-	font-size: 9pt;
+	font-size: 10pt;
+}
+
+div {
+	line-height: 15px;
 }
