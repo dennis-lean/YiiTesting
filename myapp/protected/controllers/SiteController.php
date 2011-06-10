@@ -79,7 +79,7 @@ class SiteController extends Controller
 		} else {
 			$result = new stdClass();
 			$result->status = false;
-			$result->message = 'Incorrect username or password.';
+			$result->message = 'Incorrect Email Address or Password.';
 			echo json_encode($result);
 			Yii::app()->end();
 			
@@ -94,15 +94,57 @@ class SiteController extends Controller
 		} else {
 			$this->render('change-password');
 		}
+	}
+	
+	public function actionPerformChangePassword()
+	{
+		if (empty( $_POST )) {
+			header("HTTP/1.0 400 Bad Request");
+			die;
+		}
 		
-//		$user = new User;
-//		$user->attributes = array(
-//			'username' => 'tttt',
-//			'password' => 'asdfsdf',
-//			'salt' => 'asdfasdf',
-//			'email' => 'asdfasdfsdf',
-//		);
-//		$user->save();
+		$data = $_POST;
+		if ( empty($data['old_pwd']) ||
+			 empty($data['new_pwd']) ||
+			 empty($data['new_pwd_verify']) ||
+			 $data['new_pwd'] !== $data['new_pwd_verify'] )
+		{
+			$result = new stdClass();
+			$result->status = false;
+			$result->message = 'Invalid password.';
+			echo json_encode($result);
+			Yii::app()->end();
+		}
+		else
+		{
+			$user = User::model()->find( 'id = ?',array( Yii::app()->user->getId() ) );
+
+			if ( $user === null ) {
+				$data['message'] = "Invalid request.";
+				$this->render('error-message', $data);
+				return;
+
+			} else if ( !$user->validatePassword( $data['old_pwd'] ) ) {
+				$result = new stdClass();
+				$result->status = false;
+				$result->message = 'Invalid old password.';
+				echo json_encode($result);
+				Yii::app()->end();
+				
+			} else {
+				$user->salt = $this->generateSalt();
+				$user->password = $user->hashPassword($data['new_pwd'], $user->salt);
+				$user->update();
+
+				$result = new stdClass();
+				$result->status = true;
+				$result->message = 'Password changed successful.';
+				$result->returnUrl = Yii::app()->request->baseUrl;
+				echo json_encode($result);
+				Yii::app()->end();
+			}
+
+		}
 	}
 	
 	public function actionPerformResetPassword()
@@ -113,7 +155,51 @@ class SiteController extends Controller
 		}
 		
 		$data = $_POST;
-		die(var_dump($data));
+		if ( empty($data['pwd']) ||
+			 empty($data['pwd_verify']) ||
+			 $data['pwd'] !== $data['pwd_verify'] )
+		{
+			$result = new stdClass();
+			$result->status = false;
+			$result->message = 'Invalid password.';
+			echo json_encode($result);
+			Yii::app()->end();
+		}
+		else if (isset($_GET['token'])) {
+			$user_token = User::model()->find( 'LOWER(reset_token) = ?',array( strtolower( $_GET['token'] ) ) );
+
+			//Token validation
+			if ( $user_token === null ) {
+				$data['message'] = "Invalid request.";
+				$this->render('error-message', $data);
+				return;
+
+			} else if ( $user_token->reset_expired < time() ) {
+				$data['message'] = "Token has expired. Please request again.";
+				$this->render('error-message', $data);
+				return;
+
+			} else {
+				$user_token->salt = $this->generateSalt();
+				$user_token->password = $user_token->hashPassword($data['pwd'], $user_token->salt);
+				$user_token->reset_token = null;
+				$user_token->reset_expired = null;
+				$user_token->update();
+
+				$result = new stdClass();
+				$result->status = true;
+				$result->message = 'Password changed successful.';
+				$result->returnUrl = Yii::app()->request->baseUrl;
+				echo json_encode($result);
+				Yii::app()->end();
+			}
+
+		} else {
+			//Invalid Request!
+			$data['message'] = "Invalid Request";
+			$this->render('error-message', $data);
+
+		}
 	}
 	
 	public function actionResetPassword()
@@ -135,7 +221,7 @@ class SiteController extends Controller
 				
 			}
 			
-			$data['email'] = $user_token->email;
+			$data['email'] = $user_token->username;
 			$this->render('reset-password', $data);
 			
 		} else {
@@ -243,7 +329,7 @@ HTML;
 	}
 	
 	private function createResetPasswordToken() {
-		$token = sha1( uniqid('',true) . $this->email );
+		$token = $this->generateSalt( $this->email );
 		$user = User::model()->find( 'LOWER(username) = ?',array( strtolower($this->email) ) );
 		$user->reset_token = $token;
 		$user->reset_expired = time() + (7 * 24 * 3600);
@@ -251,4 +337,9 @@ HTML;
 		
 		return $token;
 	}
+	
+	private function generateSalt($extra = '') {
+		return sha1( uniqid('',true) . $extra );
+	}
+	
 }

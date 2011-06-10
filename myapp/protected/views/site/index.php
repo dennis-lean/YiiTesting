@@ -119,8 +119,13 @@ function validateLogin() {
 		focus = 'email';
 		result = false;
 		
+	} else if ( !validateEmail( email ) ) {
+		errMsg = "Invalid Email Address.";
+		focus = 'email';
+		result = false;
+
 	} else if (pwd == "") {
-		errMsg += " Password is required.";
+		errMsg = "Password is required.";
 		focus = 'pwd';
 		result = false;
 	}
@@ -134,39 +139,56 @@ function validateLogin() {
 function showResetPwd() {
 	showTheater();
 	$('#resetpwd_form').show();
+	$('#resetpwd_email').focus();
 }
 
 function doResetPwd() {
-	$.ajax({
-		url: baseUrl + '/?r=site/sendResetPassword',
-		type: "POST",
-		dataType: "json",
-		data: {
-			email: $('#resetpwd_email').val()
-		},
-		success: function(data) {
-			$('#resetpwd_msg').html( data.message );
-		},
-		fail: function() {
-			//loginAjaxFail();
-		}
-	});
+	var email = $('#resetpwd_email').val();
+	if ( email == '' ) {
+		$('#resetpwd_msg').html( "Email address is required." );
+		$('#resetpwd_email').focus();
+		return;
+		
+	} else if ( !validateEmail( email ) ) {
+		$('#resetpwd_msg').html( "Invalid email address." );
+		$('#resetpwd_email').focus();
+		return;
+		
+	} else {
+		$.ajax({
+			url: baseUrl + '/?r=site/sendResetPassword',
+			type: "POST",
+			dataType: "json",
+			data: {
+				email: email
+			},
+			success: function(data) {
+				$('#resetpwd_msg').html( data.message );
+			},
+			fail: function() {
+				$('#resetpwd_msg').html( 'Error connecting to server. Please try again.' );
+			}
+		});
+	}
 }
 
 function hideResetPwd() {
 	hideTheater();
 	$('#resetpwd_form').hide();
+	$('#email').focus();
 }
 
 function showSignup() {
 	showTheater();
 	$('#signup_form').show();
+	$('#signup_email').focus();
 }
 
 
 function hideSignup() {
 	hideTheater();
 	$('#signup_form').hide();
+	$('#email').focus();
 }
 
 function showTheater() {
@@ -177,19 +199,5 @@ function showTheater() {
 function hideTheater() {
 	$('body').removeClass('theater-mode');
 	$('#main_form input').removeAttr('disabled');
-}
-
-function validateEmail( email ) {
-	var emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-	return emailRegex.test( trim( email ) );
-}
-
-
-//PHPJS function
-function trim(str,charlist){
-var whitespace,l=0,i=0;str+='';if(!charlist){whitespace=" \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000";}else{charlist+='';whitespace=charlist.replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g,'$1');}
-l=str.length;for(i=0;i<l;i++){if(whitespace.indexOf(str.charAt(i))===-1){str=str.substring(i);break;}}
-l=str.length;for(i=l-1;i>=0;i--){if(whitespace.indexOf(str.charAt(i))===-1){str=str.substring(0,i+1);break;}}
-return whitespace.indexOf(str.charAt(0))===-1?str:'';
 }
 </script>

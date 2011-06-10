@@ -37,9 +37,9 @@ function setListener() {
 }
 
 function doLogin() {
-	if (!validateLogin()) return;
+	if (!validateForm()) return;
 	$.ajax({
-		url: baseUrl + '/?r=site/changePassword&act=reset',
+		url: baseUrl + '/?r=site/performResetPassword&token=' + (/\?.*\&token=(.*)/.exec(location.search)[1]),
 		type: "POST",
 		dataType: "json",
 		data: {
@@ -47,28 +47,28 @@ function doLogin() {
 			pwd_verify: $('#pwd-verify').val()
 		},
 		success: function(data) {
-			loginAjaxSuccess(data);
+			runAjaxSuccess(data);
 		},
 		fail: function() {
-			loginAjaxFail();
+			runAjaxFail();
 		}
 	});
 }
 
-function loginAjaxSuccess(data) {
+function runAjaxSuccess(data) {
 	if ( data.status ) {
 		$('#errMsg').html( data.message );
-		location.reload();
+		location.replace( data.returnUrl );
 	} else {
 		$('#errMsg').html( data.message );
 	}
 }
 
-function loginAjaxFail() {
+function runAjaxFail() {
 	$('#errMsg').html( 'Error connecting to server. Please try again.' );
 }
 
-function validateLogin() {
+function validateForm() {
 	var pwd = $('#pwd').val();
 	var pwdVerify = $('#pwd-verify').val();
 	var focus = '';
@@ -77,7 +77,7 @@ function validateLogin() {
 	var result = true;
 	
 	if (pwd == "") {
-		errMsg += " Password is required.";
+		errMsg = "Password is required.";
 		focus = 'pwd';
 		result = false;
 		
@@ -96,19 +96,5 @@ function validateLogin() {
 	
 	if (!result) $('#' + focus).focus();
 	return result;
-}
-
-function validateEmail( email ) {
-	var emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-	return emailRegex.test( trim( email ) );
-}
-
-
-//PHPJS function
-function trim(str,charlist){
-var whitespace,l=0,i=0;str+='';if(!charlist){whitespace=" \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000";}else{charlist+='';whitespace=charlist.replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g,'$1');}
-l=str.length;for(i=0;i<l;i++){if(whitespace.indexOf(str.charAt(i))===-1){str=str.substring(i);break;}}
-l=str.length;for(i=l-1;i>=0;i--){if(whitespace.indexOf(str.charAt(i))===-1){str=str.substring(0,i+1);break;}}
-return whitespace.indexOf(str.charAt(0))===-1?str:'';
 }
 </script>
