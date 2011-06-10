@@ -120,9 +120,11 @@ class SiteController extends Controller
 			$user = User::model()->find( 'id = ?',array( Yii::app()->user->getId() ) );
 
 			if ( $user === null ) {
-				$data['message'] = "Invalid request.";
-				$this->render('error-message', $data);
-				return;
+				$result = new stdClass();
+				$result->status = false;
+				$result->message = 'Invalid request.';
+				echo json_encode($result);
+				Yii::app()->end();
 
 			} else if ( !$user->validatePassword( $data['old_pwd'] ) ) {
 				$result = new stdClass();
@@ -143,7 +145,6 @@ class SiteController extends Controller
 				echo json_encode($result);
 				Yii::app()->end();
 			}
-
 		}
 	}
 	
@@ -247,7 +248,7 @@ class SiteController extends Controller
 		} else {
 			$to = $this->email;
 			$to = 'dennis@40square.com';
-			$subject = 'reset password for My App';
+			$subject = 'Reset password for My App';
 			$link = Yii::app()->request->hostInfo . Yii::app()->request->baseUrl . '/?r=site/resetPassword&token=' . $this->createResetPasswordToken( );
 			$message = <<<HTML
 <html>
@@ -259,31 +260,18 @@ class SiteController extends Controller
 		We received your request regarding the matter above.<br />
 		Well, don't worry by clicking the link below and you will be able to create your new password.<br />
 		<a href="$link">$link</a><br />
-<br />
+		<br />
 		The link token will expire after 7 days.<br />
 		Ignore this email if you don't want to reset your password.<br />
-<br />
-<br />
-Regards,<br />
-Webmaster<br />
-My App<br />
+		<br />
+		<br />
+		Regards,<br />
+		Webmaster<br />
+		My App<br />
 	</body>
 </html>
 HTML;
-
-			// To send HTML mail, the Content-type header must be set
-			$headers  = 'MIME-Version: 1.0' . "\r\n";
-			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-
-			// Additional headers
-//			$headers .= 'To: <' . $this->email . '>' . "\r\n";
-			$headers .= 'To: <' . 'dennis@40square.com' . '>' . "\r\n";
-			$headers .= 'From: ' . Yii::app()->params['noReplyName'] . ' <' . Yii::app()->params['noReplyEmail'] . ">\r\n";
-
-			// Mail it
-			mail($to, $subject, $message, $headers);
-			
-			
+			$this->emailNotice($to, $subject, $message);
 
 			//User is exist
 			$result = new stdClass();
@@ -317,8 +305,49 @@ HTML;
 	
 	public function actionCreateUser()
 	{
-		
-		
+		if (empty( $_POST )) {
+			header("HTTP/1.0 400 Bad Request");
+			die;
+		}
+
+		$data = $_POST;
+		if ( empty($data['email']) ||
+			 empty($data['pwd']) ||
+			 empty($data['pwd_verify']) ||
+			 $data['pwd'] !== $data['pwd_verify'] )
+		{
+			$result = new stdClass();
+			$result->status = false;
+			$result->message = 'Invalid password.';
+			echo json_encode($result);
+			Yii::app()->end();
+		}
+		else
+		{
+			$user = User::model()->find( 'username = ?',array( $data['email'] ) );
+
+			if ( $user !== null ) {
+				$result = new stdClass();
+				$result->status = false;
+				$result->message = 'Email already exist.';
+				echo json_encode($result);
+				Yii::app()->end();
+
+			} else {
+				$user = new User();
+				$user->username = $data['email'];
+				$user->salt = $this->generateSalt();
+				$user->password = $user->hashPassword($data['pwd'], $user->salt);
+				$user->save();
+
+				$result = new stdClass();
+				$result->status = true;
+				$result->message = 'Account created.';
+				$result->returnUrl = Yii::app()->request->baseUrl;
+				echo json_encode($result);
+				Yii::app()->end();
+			}
+		}
 	}
 	
 	private function authenticate()
@@ -341,5 +370,20 @@ HTML;
 	private function generateSalt($extra = '') {
 		return sha1( uniqid('',true) . $extra );
 	}
-	
+
+	private function emailNotice($to, $subject, $message)
+	{
+$to = 'dennis@40square.com';
+		// To send HTML mail, the Content-type header must be set
+		$headers  = 'MIME-Version: 1.0' . "\r\n";
+		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+
+		// Additional headers
+//			$headers .= 'To: <' . $this->email . '>' . "\r\n";
+		$headers .= 'To: <' . 'dennis@40square.com' . '>' . "\r\n";
+		$headers .= 'From: ' . Yii::app()->params['noReplyName'] . ' <' . Yii::app()->params['noReplyEmail'] . ">\r\n";
+
+		// Mail it
+		mail($to, $subject, $message, $headers);
+	}
 }

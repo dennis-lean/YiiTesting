@@ -8,13 +8,13 @@
 		<div>Email Address</div>
 		<div><input type="text" id="signup_email" class="big-textbox" value="" /></div>
 		<div>Password</div>
-		<div><input type="text" id="signup_pwd" class="big-textbox" value="" /></div>
+		<div><input type="password" id="signup_pwd" class="big-textbox" value="" /></div>
 		<div>Password - Verify</div>
-		<div><input type="text" id="signup_pwd_verify" class="big-textbox" value="" /></div>
+		<div><input type="password" id="signup_pwd_verify" class="big-textbox" value="" /></div>
 		<div style="text-align: center; margin-top: 15px;">
-			<input type="button" value="Create Account" />
+			<input type="button" value="Create Account" onclick="doSignup();" />
 		</div>
-		<div id="signup_msg" style="color: #F00; font-size: 10pt; margin-top: 15px; height: 20px;"></div>
+		<div id="signup_msg" style="color: #F00; font-size: 10pt; margin-top: 15px; height: 20px; text-align: center;"></div>
 	</div>
 	
 	<!-- Reset Password Form -->
@@ -26,14 +26,14 @@
 		<div style="text-align: center; margin-top: 15px;">
 			<input type="button" value="reset password" onclick="doResetPwd();" />
 		</div>
-		<div id="resetpwd_msg" style="color: #F00; font-size: 10pt; margin-top: 15px; height: 20px;"></div>
+		<div id="resetpwd_msg" style="color: #F00; font-size: 10pt; margin-top: 15px; height: 20px; text-align: center;"></div>
 	</div>
 </div>
 
 
 
 <div id="main_form">
-	<div style="margin-bottom: 30px;">Member please login.</div>
+	<h4 style="margin-top: 0px;">Member Login</h4>
 	<!-- Login Form -->
 	<div>Email Address</div>
 	<div>
@@ -47,7 +47,7 @@
 	<div style="text-align: center;">
 		<input type="button" id="login" value="Login" />
 	</div>
-	<div id="errMsg" style="height: 20px; line-height: 20px; margin: 15px auto;"></div>
+	<div id="errMsg" style="height: 20px; line-height: 20px; margin: 5px auto;"></div>
 	<hr />
 	<div style="text-align: center;">
 		<span style="margin-bottom: 10px;">Forgot password? <input type="button" id="resetpwd" value="Reset Password" /></span> |
@@ -184,6 +184,55 @@ function showSignup() {
 	$('#signup_email').focus();
 }
 
+function doSignup() {
+	var email = $('#signup_email').val();
+	var pwd = $('#signup_pwd').val();
+	var pwd_verify = $('#signup_pwd_verify').val();
+	
+	if ( email == '' ) {
+		$('#signup_msg').html( "Email address is required." );
+		$('#signup_email').focus();
+		return;
+
+	} else if ( !validateEmail( email ) ) {
+		$('#signup_msg').html( "Invalid email address." );
+		$('#signup_email').focus();
+		return;
+
+	} else if ( pwd == '' ) {
+		$('#signup_msg').html( "Password is required." );
+		$('#signup_pwd').focus();
+		return;
+
+	} else if ( pwd_verify == '' ) {
+		$('#signup_msg').html( "Password - Verify is required." );
+		$('#signup_pwd_verify').focus();
+		return;
+
+	} else if ( pwd != pwd_verify ) {
+		$('#signup_msg').html( "Password - Verify is not match." );
+		$('#signup_pwd_verify').focus();
+		return;
+
+	} else {
+		$.ajax({
+			url: baseUrl + '/?r=site/createUser',
+			type: "POST",
+			dataType: "json",
+			data: {
+				email: email,
+				pwd: pwd,
+				pwd_verify: pwd_verify
+			},
+			success: function(data) {
+				$('#signup_msg').html( data.message );
+			},
+			fail: function() {
+				$('#signup_msg').html( 'Error connecting to server. Please try again.' );
+			}
+		});
+	}
+}
 
 function hideSignup() {
 	hideTheater();

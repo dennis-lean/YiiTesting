@@ -8,8 +8,6 @@ class User extends CActiveRecord
 	 * @var string $username
 	 * @var string $password
 	 * @var string $salt
-	 * @var string $email
-	 * @var string $profile
 	 */
 
 	/**
@@ -37,8 +35,8 @@ class User extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('username, password, salt, email', 'required'),
-			array('username, password, salt, email', 'length', 'max'=>128)
+			array('username, password, salt', 'required'),
+			array('username, password, salt', 'length', 'max'=>128)
 		);
 	}
 
@@ -64,7 +62,6 @@ class User extends CActiveRecord
 			'username' => 'Username',
 			'password' => 'Password',
 			'salt' => 'Salt',
-			'email' => 'Email',
 		);
 	}
 

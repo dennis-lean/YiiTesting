@@ -1,5 +1,5 @@
 <div id="main_form">
-	<div style="margin-bottom: 30px;">Reset password.</div>
+	<h4 style="margin-top: 0px;">Reset Password</h4>
 	<div>Email Address</div>
 	<div>
 		<input type="text" class="big-textbox" value="<?=$email ?>" disabled />
@@ -16,7 +16,7 @@
 	<div style="text-align: center;">
 		<input type="button" id="submit" value="Submit" />
 	</div>
-	<div id="errMsg" style="height: 20px; line-height: 20px; margin: 15px auto;"></div>
+	<div id="errMsg" style="height: 20px; line-height: 20px; margin: 5px auto;"></div>
 </div>
 
 

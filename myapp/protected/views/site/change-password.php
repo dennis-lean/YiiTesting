@@ -1,5 +1,5 @@
 <div id="main_form">
-	<div style="margin-bottom: 30px;">Reset password.</div>
+	<h4 style="margin-top: 0px;">Change Password</h4>
 	<div>Old Password</div>
 	<div>
 		<input type="password" id="old-pwd" class="big-textbox" />
