@@ -11,8 +11,10 @@
 <body>
 
 <div class="container" id="page">
-	<div class="header">Dennis Site</div>
-	<?php echo $content; ?>
+	<div class="header"><a href="<?php echo Yii::app()->request->baseUrl; ?>">Dennis Site</a></div>
+	<div style="padding: 10px 20px;">
+		<?php echo $content; ?>
+	</div>
 </div>
 
 </body>

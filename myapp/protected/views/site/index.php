@@ -6,15 +6,15 @@
 		<div class="close_button" onclick="hideSignup()">X</div>
 		<div style="margin-bottom: 30px;">Sign Up</div>
 		<div>Email Address</div>
-		<div><input type="text" id="resetpwd_email" class="big-textbox" value="" /></div>
+		<div><input type="text" id="signup_email" class="big-textbox" value="" /></div>
 		<div>Password</div>
-		<div><input type="text" id="resetpwd_email" class="big-textbox" value="" /></div>
+		<div><input type="text" id="signup_pwd" class="big-textbox" value="" /></div>
 		<div>Password - Verify</div>
-		<div><input type="text" id="resetpwd_email" class="big-textbox" value="" /></div>
+		<div><input type="text" id="signup_pwd_verify" class="big-textbox" value="" /></div>
 		<div style="text-align: center; margin-top: 15px;">
 			<input type="button" value="Create Account" />
 		</div>
-		<div style="color: #00A; font-size: 10pt; margin-top: 15px; height: 20px;"></div>
+		<div id="signup_msg" style="color: #F00; font-size: 10pt; margin-top: 15px; height: 20px;"></div>
 	</div>
 	
 	<!-- Reset Password Form -->
@@ -24,9 +24,9 @@
 		<div>Email Address</div>
 		<div><input type="text" id="resetpwd_email" class="big-textbox" value="" /></div>
 		<div style="text-align: center; margin-top: 15px;">
-			<input type="button" value="reset password" />
+			<input type="button" value="reset password" onclick="doResetPwd();" />
 		</div>
-		<div style="color: #00A; font-size: 10pt; margin-top: 15px; height: 20px;"></div>
+		<div id="resetpwd_msg" style="color: #F00; font-size: 10pt; margin-top: 15px; height: 20px;"></div>
 	</div>
 </div>
 
@@ -70,8 +70,8 @@ $(document).ready(function() {
 
 function setListener() {
 	$('#login').bind('click', doLogin);
-	$('#resetpwd').bind('click', doResetPwd);
-	$('#signup').bind('click', doSignup);
+	$('#resetpwd').bind('click', showResetPwd);
+	$('#signup').bind('click', showSignup);
 }
 
 function doLogin() {
@@ -118,11 +118,10 @@ function validateLogin() {
 		errMsg = "Email Address is required.";
 		focus = 'email';
 		result = false;
-	}
-	
-	if (pwd == "") {
+		
+	} else if (pwd == "") {
 		errMsg += " Password is required.";
-		if (focus == '') focus = 'pwd';
+		focus = 'pwd';
 		result = false;
 	}
 	
@@ -132,9 +131,26 @@ function validateLogin() {
 	return result;
 }
 
-function doResetPwd() {
+function showResetPwd() {
 	showTheater();
 	$('#resetpwd_form').show();
+}
+
+function doResetPwd() {
+	$.ajax({
+		url: baseUrl + '/?r=site/sendResetPassword',
+		type: "POST",
+		dataType: "json",
+		data: {
+			email: $('#resetpwd_email').val()
+		},
+		success: function(data) {
+			$('#resetpwd_msg').html( data.message );
+		},
+		fail: function() {
+			//loginAjaxFail();
+		}
+	});
 }
 
 function hideResetPwd() {
@@ -142,11 +158,11 @@ function hideResetPwd() {
 	$('#resetpwd_form').hide();
 }
 
-function doSignup() {
+function showSignup() {
 	showTheater();
 	$('#signup_form').show();
 }
-//An email has sent to you.<br />Please check your mailbox.
+
 
 function hideSignup() {
 	hideTheater();
