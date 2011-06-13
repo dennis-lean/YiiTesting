@@ -4,5 +4,5 @@
 return array(
 	'adminEmail'=>'ssiangge@yahoo.com.sg',
 	'noReplyEmail'=>'noreply@myapp.com',
-	'noReplyName'=>'Reset Password for My App',
+	'noReplyName'=>'Notification from My App',
 );

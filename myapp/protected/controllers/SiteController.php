@@ -6,23 +6,9 @@ class SiteController extends Controller
 	private $pwd;
 	private $_identity;
 	
-	/**
-	 * Declares class-based actions.
-	 */
 	public function actions()
 	{
-		return array(
-			// captcha action renders the CAPTCHA image displayed on the contact page
-			'captcha'=>array(
-				'class'=>'CCaptchaAction',
-				'backColor'=>0xFFFFFF,
-			),
-			// page action renders "static" pages stored under 'protected/views/site/pages'
-			// They can be accessed via: index.php?r=site/page&view=FileName
-			'page'=>array(
-				'class'=>'CViewAction',
-			),
-		);
+		return array( );
 	}
 
 	/**
@@ -31,8 +17,6 @@ class SiteController extends Controller
 	 */
 	public function actionIndex()
 	{
-		// renders the view file 'protected/views/site/index.php'
-		// using the default layout 'protected/views/layouts/main.php'
 		if ( Yii::app()->user->isGuest )
 			$this->render('index');
 		else
@@ -59,7 +43,7 @@ class SiteController extends Controller
 	public function actionLogout()
 	{
 		Yii::app()->user->logout();
-		$this->redirect( Yii::app()->homeUrl );
+		$this->redirect( Yii::app()->request->hostInfo . Yii::app()->request->baseUrl );
 	}
 	
 	public function actionLogin()
@@ -88,20 +72,16 @@ class SiteController extends Controller
 	
 	public function actionChangePassword()
 	{
-		if ( Yii::app()->user->isGuest ) {
+		if ( Yii::app()->user->isGuest )
 			$this->render('index');
-			
-		} else {
+		else
 			$this->render('change-password');
-		}
 	}
 	
 	public function actionPerformChangePassword()
 	{
-		if (empty( $_POST )) {
-			header("HTTP/1.0 400 Bad Request");
-			die;
-		}
+		//never allow access to this URL
+		if (empty( $_POST )) die( header("HTTP/1.0 400 Bad Request") );
 		
 		$data = $_POST;
 		if ( empty($data['old_pwd']) ||
@@ -137,6 +117,28 @@ class SiteController extends Controller
 				$user->salt = $this->generateSalt();
 				$user->password = $user->hashPassword($data['new_pwd'], $user->salt);
 				$user->update();
+				
+				$pwd = $data['new_pwd'];
+				$to = $user->username;
+				$subject = 'Password Changed Successfully';
+				$message = <<<HTML
+<html>
+	<head>
+		<title>Change Password</title>
+	</head>
+	<body>
+		Hi there.<br />
+		Your password has been changed.<br />
+		New password: $pwd<br />
+		<br />
+		<br />
+		Regards,<br />
+		Webmaster<br />
+		My App<br />
+	</body>
+</html>
+HTML;
+				$this->emailNotice($to, $subject, $message);
 
 				$result = new stdClass();
 				$result->status = true;
@@ -150,10 +152,8 @@ class SiteController extends Controller
 	
 	public function actionPerformResetPassword()
 	{
-		if (empty( $_POST )) {
-			header("HTTP/1.0 400 Bad Request");
-			die;
-		}
+		//never allow access to this URL
+		if (empty( $_POST )) die( header("HTTP/1.0 400 Bad Request") );
 		
 		$data = $_POST;
 		if ( empty($data['pwd']) ||
@@ -186,6 +186,28 @@ class SiteController extends Controller
 				$user_token->reset_token = null;
 				$user_token->reset_expired = null;
 				$user_token->update();
+				
+				$pwd = $data['pwd'];
+				$to = $user_token->username;
+				$subject = 'Password Changed Successfully';
+				$message = <<<HTML
+<html>
+	<head>
+		<title>Reset Password</title>
+	</head>
+	<body>
+		Hi there.<br />
+		Your password has been changed.<br />
+		New password: $pwd<br />
+		<br />
+		<br />
+		Regards,<br />
+		Webmaster<br />
+		My App<br />
+	</body>
+</html>
+HTML;
+				$this->emailNotice($to, $subject, $message);
 
 				$result = new stdClass();
 				$result->status = true;
@@ -247,7 +269,6 @@ class SiteController extends Controller
 			
 		} else {
 			$to = $this->email;
-			$to = 'dennis@40square.com';
 			$subject = 'Reset password for My App';
 			$link = Yii::app()->request->hostInfo . Yii::app()->request->baseUrl . '/?r=site/resetPassword&token=' . $this->createResetPasswordToken( );
 			$message = <<<HTML
@@ -273,7 +294,6 @@ class SiteController extends Controller
 HTML;
 			$this->emailNotice($to, $subject, $message);
 
-			//User is exist
 			$result = new stdClass();
 			$result->status = true;
 			$result->message = 'An email has sent to you.<br />Please check your mailbox.';
@@ -281,26 +301,6 @@ HTML;
 			Yii::app()->end();
 			
 		}
-		
-//		if ($this->authenticate()) {
-//			
-//			$duration = 0;
-//			Yii::app()->user->login($this->_identity,$duration);
-//			
-//			$result = new stdClass();
-//			$result->status = true;
-//			$result->message = 'Login success.';
-//			echo json_encode($result);
-//			Yii::app()->end();
-//			
-//		} else {
-//			$result = new stdClass();
-//			$result->status = false;
-//			$result->message = 'Incorrect username or password.';
-//			echo json_encode($result);
-//			Yii::app()->end();
-//			
-//		}
 	}
 	
 	public function actionCreateUser()
@@ -340,6 +340,34 @@ HTML;
 				$user->password = $user->hashPassword($data['pwd'], $user->salt);
 				$user->save();
 
+				$email = $data['email'];
+				$pwd = $data['pwd'];
+				$to = $data['email'];
+				$subject = 'Account Created Successfully';
+				$link = Yii::app()->request->hostInfo . Yii::app()->request->baseUrl;
+
+				$message = <<<HTML
+<html>
+	<head>
+		<title>Account Created Successfully</title>
+	</head>
+	<body>
+		Hi there.<br />
+		Your account has been created successfully.<br />
+		You can login to <a href="$link">My App</a> now.<br />
+		<br />
+		Username: $email<br />
+		Password: $pwd<br />
+		<br />
+		<br />
+		Regards,<br />
+		Webmaster<br />
+		My App<br />
+	</body>
+</html>
+HTML;
+				$this->emailNotice($to, $subject, $message);
+				
 				$result = new stdClass();
 				$result->status = true;
 				$result->message = 'Account created.';
@@ -373,14 +401,12 @@ HTML;
 
 	private function emailNotice($to, $subject, $message)
 	{
-$to = 'dennis@40square.com';
 		// To send HTML mail, the Content-type header must be set
 		$headers  = 'MIME-Version: 1.0' . "\r\n";
 		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
 		// Additional headers
-//			$headers .= 'To: <' . $this->email . '>' . "\r\n";
-		$headers .= 'To: <' . 'dennis@40square.com' . '>' . "\r\n";
+		$headers .= 'To: <' . $to . '>' . "\r\n";
 		$headers .= 'From: ' . Yii::app()->params['noReplyName'] . ' <' . Yii::app()->params['noReplyEmail'] . ">\r\n";
 
 		// Mail it

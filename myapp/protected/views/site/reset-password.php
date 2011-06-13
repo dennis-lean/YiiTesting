@@ -33,11 +33,12 @@ $(document).ready(function() {
 });
 
 function setListener() {
-	$('#submit').bind('click', doLogin);
+	$('#submit').bind('click', doAction);
 }
 
-function doLogin() {
+function doAction() {
 	if (!validateForm()) return;
+	$('#errMsg').html( 'Please wait...' );
 	$.ajax({
 		url: baseUrl + '/?r=site/performResetPassword&token=' + (/\?.*\&token=(.*)/.exec(location.search)[1]),
 		type: "POST",

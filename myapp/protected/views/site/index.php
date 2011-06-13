@@ -76,6 +76,7 @@ function setListener() {
 
 function doLogin() {
 	if (!validateLogin()) return;
+	$('#errMsg').html( 'Please wait...' );
 	$.ajax({
 		url: baseUrl + '/?r=site/login',
 		type: "POST",
@@ -96,9 +97,11 @@ function doLogin() {
 function loginAjaxSuccess(data) {
 	if ( data.status ) {
 		$('#errMsg').html( data.message );
-		location.reload();
+		$( document ).delay( 1000 ).queue( function() { location.reload(); } );
+		
 	} else {
 		$('#errMsg').html( data.message );
+		
 	}
 }
 
@@ -144,6 +147,8 @@ function showResetPwd() {
 
 function doResetPwd() {
 	var email = $('#resetpwd_email').val();
+	
+	$('#resetpwd_msg').html( 'Please wait...' );
 	if ( email == '' ) {
 		$('#resetpwd_msg').html( "Email address is required." );
 		$('#resetpwd_email').focus();
@@ -155,6 +160,7 @@ function doResetPwd() {
 		return;
 		
 	} else {
+		$('#resetpwd_msg').html( 'Please wait...' );
 		$.ajax({
 			url: baseUrl + '/?r=site/sendResetPassword',
 			type: "POST",
@@ -164,6 +170,7 @@ function doResetPwd() {
 			},
 			success: function(data) {
 				$('#resetpwd_msg').html( data.message );
+				$( document ).delay( 3000 ).queue( function() { hideResetPwd(); } );
 			},
 			fail: function() {
 				$('#resetpwd_msg').html( 'Error connecting to server. Please try again.' );
@@ -189,6 +196,7 @@ function doSignup() {
 	var pwd = $('#signup_pwd').val();
 	var pwd_verify = $('#signup_pwd_verify').val();
 	
+	$('#signup_msg').html( 'Please wait...' );
 	if ( email == '' ) {
 		$('#signup_msg').html( "Email address is required." );
 		$('#signup_email').focus();
@@ -215,6 +223,7 @@ function doSignup() {
 		return;
 
 	} else {
+		$('#signup_msg').html( 'Please wait...' );
 		$.ajax({
 			url: baseUrl + '/?r=site/createUser',
 			type: "POST",
@@ -226,6 +235,7 @@ function doSignup() {
 			},
 			success: function(data) {
 				$('#signup_msg').html( data.message );
+				$( document ).delay( 3000 ).queue( function() { hideSignup(); } );
 			},
 			fail: function() {
 				$('#signup_msg').html( 'Error connecting to server. Please try again.' );

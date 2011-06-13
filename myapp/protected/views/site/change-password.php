@@ -33,11 +33,13 @@ $(document).ready(function() {
 });
 
 function setListener() {
-	$('#submit').bind('click', doLogin);
+	$('#submit').bind('click', doAction);
 }
 
-function doLogin() {
+function doAction() {
 	if (!validateForm()) return;
+	$('#errMsg').html( 'Please wait...' );
+	
 	$.ajax({
 		url: baseUrl + '/?r=site/performChangePassword',
 		type: "POST",
@@ -59,9 +61,11 @@ function doLogin() {
 function runAjaxSuccess(data) {
 	if ( data.status ) {
 		$('#errMsg').html( data.message );
-		location.replace( data.returnUrl );
+		$( document ).delay( 1000 ).queue( function() { location.replace( data.returnUrl ); } );
+		
 	} else {
 		$('#errMsg').html( data.message );
+		
 	}
 }
 
